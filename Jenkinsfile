@@ -47,7 +47,11 @@ pipeline {
                 sh 'docker run -d --name petclinic -p 8080:8080 eclipseq57/petclinic:latest'
                 sh 'sleep 30'
               }
-            step([$class: 'WsCleanup'])
             }
+       }
+        post { 
+            always { 
+                cleanWs()
+        }
     }
 }
