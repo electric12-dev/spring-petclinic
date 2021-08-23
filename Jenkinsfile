@@ -26,7 +26,7 @@ pipeline {
         stage('Build Docker Image Petclinic') {
             steps {
                 script {
-                    sh 'newgrp docker'
+                    sh 'newgrp docker && systemctl restart docker'
                     app = docker.build("eclipseq57/petclinic")
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
         }
         stage("Deploy Petclinic to server"){
             steps{
-                sh 'docker system prune'
+                sh 'docker system prune -af'
                 sh 'docker run -d --name petclinic -p 8080:8080 eclipseq57/petclinic:latest'
                 sh 'sleep 30'
               }
