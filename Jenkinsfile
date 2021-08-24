@@ -1,4 +1,7 @@
 pipeline {
+    parameters {
+        choice(name: 'BUILD_NUMBER', choices: ['latest', '2', '1'], description: 'Who should I say hello to?')
+        }
     agent any
     stages {
         stage('Pull SCM') {
