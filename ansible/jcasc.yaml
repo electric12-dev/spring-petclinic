@@ -1,0 +1,52 @@
+jenkins: #Create a jenkins user with permission
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "jenkins"
+          password: "{{ jenkins_user }}"
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "Overall/Administer:authenticated"
+
+credentials: #add credentials for github and dockerhub
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: git-hub_key
+              username: "jenkins"
+              description: "git-hub_key"
+              password: "{{ jenkins_token }}"
+          
+          - usernamePassword:
+              scope: GLOBAL
+              id: Docker
+              username: "eclipseq57"
+              description: "Docker"
+              password: "{{ dockerhub_pass }}"
+
+jobs:
+  - script: >
+      multibranchPipelineJob('PetclinicCI') {
+        branchSources {
+          github {
+            // The id option in the Git and GitHub branch source contexts is now mandatory (JENKINS-43693).
+            id('main') // IMPORTANT: use a constant and unique identifier
+            scanCredentialsId('git-hub_key')
+            repoOwner('electric12-dev')
+            repository('spring-petclinic')
+            apiUri('https://github.com/api/v3') // Optional, needed for private github enterprise servers
+          }
+        }
+        orphanedItemStrategy {
+          discardOldItems {
+            numToKeep(1)
+          }
+        }
+        triggers {
+          periodic(5)
+        }
+      }
