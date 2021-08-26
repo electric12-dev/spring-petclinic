@@ -1,7 +1,7 @@
 #Get Linux AMI ID using SSM Parameter endpoint in us-east-2
 data "aws_ssm_parameter" "JenkinsMasterAmi" {
   provider = aws.region-master
-  name     = "us-east-2.console.aws.amazon.com/ec2/ami-0001378efdafd5401"
+  name     = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
 }
 
 #Create key-pair for logging into EC2 in us-east-2
@@ -30,7 +30,7 @@ EOD
   }
 
   provisioner "local-exec" {
-    command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.jenkins-master.id} --region ${var.region-master}  && ansible-playbook -i aws_hosts ansible/install_jenkins.yaml --vault-password-file ~/.ansible_pass.txt"
+    command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.jenkins-master.id} --region ${var.region-master}  && ansible-playbook -i aws_hosts ansible/install_jenkins.yaml --vault-password-file ./vault_pass.txt"
   }
 
   tags = {

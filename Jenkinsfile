@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        choice(name: 'BUILD_NUMBER', choices: ['latest', '3', '2', '1'], description: 'Who should I say hello to?')
+        choice(name: 'BUILD_NUMBER', choices: ['latest', '3', '2', '1'], description: 'Choose a version')
         }
     agent any
     stages {
@@ -44,11 +44,10 @@ pipeline {
                 sh 'sleep 30'
               }
             }
-    }
+       }
         post { 
             always { 
                 cleanWs()
-            }
         }
     }
 }

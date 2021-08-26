@@ -64,7 +64,7 @@ resource "aws_security_group" "jenkins-sg" {
   provider    = aws.region-master
   name        = "jenkins-sg"
   description = "Allow TCP/8080 8081 & TCP/22"
-  vpc_id      = aws_vpc.vpc_useast.id
+  vpc_id      = aws_vpc.vpc_east-2.id
   ingress {
     description = "Allow 22 from our public IP"
     from_port   = 22

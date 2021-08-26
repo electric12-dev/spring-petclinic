@@ -1,6 +1,6 @@
 jenkins: #Create a jenkins user with permission
   securityRealm:
-    local:
+    global:
       allowsSignup: false
       users:
         - id: "admin"
@@ -9,6 +9,33 @@ jenkins: #Create a jenkins user with permission
     globalMatrix:
       permissions:
         - "Overall/Administer:authenticated"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "jenkins"
+          password: "{{ jenkins_user }}"
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        - "Overall/Read:authenticated"        
+        - "View/Delete:authenticated"
+        - "View/Read:authenticated"
+        - "View/Configure:authenticated"
+        - "View/Create:authenticated"
+        - "Job/Read:authenticated"
+        - "Job/Build:authenticated"
+        - "Job/Configure:authenticated"
+        - "Job/Create:authenticated"
+        - "Job/Delete:authenticated"
+        - "Job/Discover:authenticated"
+        - "Job/Move:authenticated"
+        - "Job/Workspace:authenticated"
+        - "Job/Cancel:authenticated"
+        - "Run/Delete:authenticated"
+        - "Run/Replay:authenticated"
+        - "Run/Update:authenticated"
+        - "SCM/Tag:authenticated"
 
 credentials: #add credentials for github and dockerhub
   system:
@@ -19,14 +46,14 @@ credentials: #add credentials for github and dockerhub
               id: git-hub_key
               username: "jenkins"
               description: "git-hub_key"
-              password: "{{ jenkins_token }}"
+              password: "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"
           
           - usernamePassword:
               scope: GLOBAL
               id: Docker
               username: "eclipseq57"
               description: "Docker"
-              password: "{{ dockerhub_pass }}"
+              password: "g8lfC8UuV"
 
 jobs:
   - script: >
