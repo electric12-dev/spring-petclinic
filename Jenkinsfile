@@ -40,7 +40,7 @@ pipeline {
         stage("Deploy Petclinic to server"){
             steps{
                 sh 'docker system prune -af'
-                sh 'docker run -d --name petclinic$'BUILD_NUMBER' -p 8080:8080 eclipseq57/petclinic:$'BUILD_NUMBER''
+                sh 'docker run -d --name petclinic${BUILD_NUMBER} -p 8080:8080 eclipseq57/petclinic:${BUILD_NUMBER}'
                 sh 'sleep 30'
               }
             }
