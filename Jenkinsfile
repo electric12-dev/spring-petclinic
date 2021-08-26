@@ -1,24 +1,16 @@
 pipeline {
     parameters {
-        choice(name: 'BUILD_NUMBER', choices: ['latest', '2', '1'], description: 'Who should I say hello to?')
+        choice(name: 'BUILD_NUMBER', choices: ['latest', '3', '2', '1'], description: 'Who should I say hello to?')
         }
     agent any
     stages {
-        stage('Pull SCM') {
+        stage('Checkout') {
             steps {
-                dir("$WORKSPACE") {
-                checkout(
-                    scm: [
-                        $class: 'GitSCM',
-                        branches: [[name: "*/main"]],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [[url: 'https://github.com/electric12-dev/spring-petclinic', credentialsId: 'git-hub_key']]]
-                    )
-                }
+                git(
+                    url: 'https://github.com/electric12-dev/spring-petclinic',
+                    credentialsId: 'git-hub_key',
+                    branch: "qa")
             }
-            
         }
         stage("Build Jar artefact"){
             steps{
@@ -48,14 +40,15 @@ pipeline {
         stage("Deploy Petclinic to server"){
             steps{
                 sh 'docker system prune -af'
-                sh 'docker run -d --name petclinic -p 8080:8080 eclipseq57/petclinic:latest'
+                sh 'docker run -d --name petclinic$'BUILD_NUMBER' -p 8080:8080 eclipseq57/petclinic:$'BUILD_NUMBER''
                 sh 'sleep 30'
               }
             }
-       }
+    }
         post { 
             always { 
                 cleanWs()
+            }
         }
     }
 }

@@ -3,8 +3,8 @@ jenkins: #Create a jenkins user with permission
     local:
       allowsSignup: false
       users:
-        - id: "jenkins"
-          password: "{{ jenkins_user }}"
+        - id: "admin"
+          password: "{{ jenkins_admin }}"
   authorizationStrategy:
     globalMatrix:
       permissions:
@@ -30,7 +30,7 @@ credentials: #add credentials for github and dockerhub
 
 jobs:
   - script: >
-      multibranchPipelineJob('PetclinicCI') {
+      multibranchPipelineJob('PetclinicQA') {
         branchSources {
           github {
             // The id option in the Git and GitHub branch source contexts is now mandatory (JENKINS-43693).

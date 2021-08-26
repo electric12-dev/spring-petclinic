@@ -22,13 +22,13 @@ variable "profile" {
 
 variable "region-master" {
   type    = string
-  default = "us-east-1"
+  default = "us-east-2"
 }
 
 #How many Jenkins workers to spin up
 variable "ami" {
   type    = string
-  default = "ami-0001378efdafd5401"
+  default = "ami-04bade413263b6269"
 }
 variable "cred" {
   type    = string

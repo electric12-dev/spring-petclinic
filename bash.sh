@@ -1,6 +1,6 @@
 #!/bin/bash
 status=$(curl http://$1:8081 -s -o /dev/null -w "%{http_code}")
-until [ $status == 200 ]
+until [ $status == 200 ] 
   do
     sleep 30
     echo "Wait another 30 sec"
@@ -13,11 +13,9 @@ PluginsList=(
   matrix-auth
   configuration-as-code
   credentials-binding
-  #rebuild
   ssh-agent
   ws-cleanup
   junit
-  #workflow-aggregator
   build-pipeline-plugin
   conditional-buildstep
   pipeline-stage-view
@@ -44,4 +42,4 @@ until [ $status == 200 ]
     echo "Wait another 30 sec"
     status=$(curl http://$1:8081 -s -o /dev/null -w "%{http_code}")
   done
-echo "Jenkins is ready, go ahead" http://$1:8081
+echo "Jenkins is ready, go ahead to link" http://$1:8081
