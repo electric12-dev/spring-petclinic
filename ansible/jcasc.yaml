@@ -1,0 +1,77 @@
+jenkins: #Create a jenkins user with permission
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+          - name: "admin"
+            description: "Jenkins administrators"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "admin"
+          - name: "readonly"
+            description: "Read-only users"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+              - "Job/Configure"
+              - "Job/Create"
+              - "Job/Delete"
+              - "Job/Build"
+              - "Job/Cancel"
+              - "Job/Workspace"
+              - "Credentials/Create"
+              - "Credentials/Delete"
+              - "Credentials/Update"
+            assignments:
+              - "authenticated"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "{{ jenkins_admin }}"
+        - id: "jenkins"
+          password: "{{ jenkins_user }}"
+
+
+credentials: #add credentials for github and dockerhub
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: git-hub_key
+              username: "jenkins"
+              description: "git-hub_key"
+              password: "{{ jenkins_token }}"
+          
+          - usernamePassword:
+              scope: GLOBAL
+              id: Docker
+              username: "eclipseq57"
+              description: "Docker"
+              password: "{{ dockerhub_pass }}"
+
+jobs:
+  - script: >
+      multibranchPipelineJob('PetclinicQA') {
+        branchSources {
+          github {
+            id('main')
+            scanCredentialsId('git-hub_key')
+            repoOwner('electric12-dev')
+            repository('spring-petclinic')
+            apiUri('https://github.com/api/v3')
+          }
+        }
+        orphanedItemStrategy {
+          discardOldItems {
+            numToKeep(1)
+          }
+        }
+        triggers {
+          periodic(5)
+        }
+      }
