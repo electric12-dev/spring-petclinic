@@ -4,13 +4,13 @@ jenkins: #Create a jenkins user with permission
       roles:
         global:
           - name: "admin"
-            description: "Jenkins administrators"
+            description: "Jenkins administrator"
             permissions:
               - "Overall/Administer"
             assignments:
               - "admin"
           - name: "readonly"
-            description: "Read-only users"
+            description: "Read-only user"
             permissions:
               - "Overall/Read"
               - "Job/Read"
@@ -56,7 +56,7 @@ credentials: #add credentials for github and dockerhub
 
 jobs:
   - script: >
-      multibranchPipelineJob('PetclinicQA') {
+      multibranchPipelineJob('Petclinic') {
         branchSources {
           github {
             id('main')
@@ -64,11 +64,6 @@ jobs:
             repoOwner('electric12-dev')
             repository('spring-petclinic')
             apiUri('https://github.com/api/v3')
-          }
-        }
-        orphanedItemStrategy {
-          discardOldItems {
-            numToKeep(1)
           }
         }
         triggers {

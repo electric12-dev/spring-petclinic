@@ -1,7 +1,4 @@
 pipeline {
-    parameters {
-        choice(name: 'BUILD_NUMBER', choices: ['latest', '2', '1'], description: 'Who should I say hello to?')
-        }
     agent any
     stages {
         stage('Pull SCM') {
@@ -50,6 +47,19 @@ pipeline {
                 sh 'docker system prune -af'
                 sh 'docker run -d --name petclinic -p 8080:8080 eclipseq57/petclinic:latest'
                 sh 'sleep 30'
+              }
+            }
+        stage("Wait for an app is up"){
+            steps{
+                sh '''#!/bin/bash
+                status=$(curl http://localhost:8080 -s -o /dev/null -w "%{http_code}")
+                until [ $status == 200 ]
+                  do
+                    sleep 30
+                    echo "Wait another 30 sec"
+                    status=$(curl http://localhost:8080 -s -o /dev/null -w "%{http_code}")
+                  done
+                  echo "Petclinic is ready!!!"'''
               }
             }
        }
