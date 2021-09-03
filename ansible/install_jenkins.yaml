@@ -10,7 +10,7 @@
   tasks:
     - name: Create SWAP slot
       shell:
-        cmd: /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=512 && /sbin/mkswap /var/swap.1 && chmod 600 /var/swap.1 && /sbin/swapon /var/swap.1
+        cmd: /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024 && /sbin/mkswap /var/swap.1 && chmod 600 /var/swap.1 && /sbin/swapon /var/swap.1
         
     - name: Add line for start SWAP
       lineinfile:
@@ -67,13 +67,13 @@
 
     - name: Copy file jenkins config
       template:
-        src: ~/project/ansible/jenkins
+        src: jenkins
         dest: /etc/sysconfig/jenkins
         mode: '0644'
 
     - name: Copy config file for JCASC
       template:
-        src: ~/project/ansible/jcasc.yaml
+        src: jcasc.yaml
         dest: '{{ jenkins_home }}'
         mode: '0644'
 
@@ -106,4 +106,3 @@
       service:
         name: jenkins
         state: restarted
-

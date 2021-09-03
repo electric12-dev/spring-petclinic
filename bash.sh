@@ -11,7 +11,6 @@ wget http://$1:8081/jnlpJars/jenkins-cli.jar
 PluginsList=(
   git
   github-branch-source
-  matrix-auth
   role-strategy
   configuration-as-code
   credentials-binding

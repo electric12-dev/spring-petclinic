@@ -30,7 +30,7 @@ EOD
   }
 
   provisioner "local-exec" {
-    command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.jenkins-master.id}  --region ${var.region-master} && ansible-playbook -i aws_hosts ansible/install_jenkins.yaml --vault-password-file ./ansible_pass.txt"
+    command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.jenkins-master.id}  --region ${var.region-master} && ansible-playbook -i aws_hosts ansible/install_jenkins.yaml --vault-password-file ~/.vaultpass"
   }
 
   tags = {
