@@ -1,0 +1,100 @@
+---
+#tasks file for jenkins
+- name: Create SWAP slot
+  shell:
+    cmd: /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024 && /sbin/mkswap /var/swap.1 && chmod 600 /var/swap.1 && /sbin/swapon /var/swap.1
+    
+- name: Add line for start SWAP
+  lineinfile:
+    path: /etc/fstab
+    line: '/var/swap.1   swap    swap    defaults        0   0'
+
+- name: Upgrade all packages
+  yum:
+    name: '*'
+  state: latest
+
+- name: Download jenkins.repo
+  get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: import jenkins key
+  rpm_key:
+    state: present
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+- name: Install Packages
+  yum:
+    name:
+      - wget
+      - java-1.8.0-openjdk-devel
+      - git
+      - jenkins
+      - docker
+    state: present
+
+- name: start Jenkins service
+  systemd:
+    name: jenkins
+    state: started
+
+- name: start Docker service
+  systemd:
+    name: docker
+    state: started
+
+- name: Create Docker group
+  group:
+    name: docker
+    state: present
+
+- name: Create a login user for Docker
+  user:
+    name: docker
+    groups:
+        - docker
+        - "{{ ansible_user_id }}"
+    state: present
+
+- name: Copy file jenkins config
+  template:
+    src: files/jenkins
+    dest: /etc/sysconfig/jenkins
+    mode: '0644'
+
+- name: Copy config file for JCASC
+  template:
+    src: files/jcasc.yaml
+    dest: "{{ jenkins_home }}"
+    mode: '0644'
+
+- name: Disable initial setup wizard
+  copy:
+    content: "2.0"
+    dest: "{{ jenkins_home }}/jenkins.install.InstallUtil.lastExecVersion"
+
+- name: Create script directory
+  file:
+    path: "{{ jenkins_home }}/init.groovy.d"
+    state: directory
+
+- name: Add initial user configuration
+  template:
+    src: '{{ item.src }}'
+    dest: "{{ jenkins_home }}/init.groovy.d/{{ item.path }}"
+    mode: '{{ item.mode }}'
+  with_filetree: ./init.groovy.d/
+  when: item.state == 'file'
+
+- name: Jenkins skip startUp for MI
+  lineinfile:
+    dest=/etc/sysconfig/jenkins
+    regexp='^JENKINS_JAVA_OPTIONS='
+    line='JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+  register: result_skip_startup_wizard   
+
+- name: Restart Jenkins if required
+  service:
+    name: jenkins
+    state: restarted
