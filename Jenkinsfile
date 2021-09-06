@@ -20,7 +20,7 @@ pipeline {
         stage("Build Jar artefact"){
             steps{
                 echo 'Running build automation'
-                sh './mvnw clean package -Dmaven.test.skip=true'
+                sh './mvnw clean package -Dcheckstyle.skip'
               }
             }
         stage('Build Docker Image Petclinic') {
