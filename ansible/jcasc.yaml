@@ -1,41 +1,40 @@
 jenkins: #Create a jenkins user with permission
-  securityRealm:
-    global:
-      allowsSignup: false
-      users:
-        - id: "admin"
-          password: "{{ jenkins_admin }}"
   authorizationStrategy:
-    globalMatrix:
-      permissions:
-        - "Overall/Administer:authenticated"
+    roleBased:
+      roles:
+        global:
+          - name: "admin"
+            description: "Jenkins administrator"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "admin"
+          - name: "readonly"
+            description: "Read-only user"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+              - "Job/Configure"
+              - "Job/Create"
+              - "Job/Delete"
+              - "Job/Build"
+              - "Job/Cancel"
+              - "Job/Workspace"
+              - "Credentials/Create"
+              - "Credentials/Delete"
+              - "Credentials/Update"
+            assignments:
+              - "authenticated"
+
   securityRealm:
     local:
       allowsSignup: false
       users:
+        - id: "admin"
+          password: "{{ jenkins_admin }}"
         - id: "jenkins"
           password: "{{ jenkins_user }}"
-  authorizationStrategy:
-    projectMatrix:
-      permissions:
-        - "Overall/Read:authenticated"        
-        - "View/Delete:authenticated"
-        - "View/Read:authenticated"
-        - "View/Configure:authenticated"
-        - "View/Create:authenticated"
-        - "Job/Read:authenticated"
-        - "Job/Build:authenticated"
-        - "Job/Configure:authenticated"
-        - "Job/Create:authenticated"
-        - "Job/Delete:authenticated"
-        - "Job/Discover:authenticated"
-        - "Job/Move:authenticated"
-        - "Job/Workspace:authenticated"
-        - "Job/Cancel:authenticated"
-        - "Run/Delete:authenticated"
-        - "Run/Replay:authenticated"
-        - "Run/Update:authenticated"
-        - "SCM/Tag:authenticated"
+
 
 credentials: #add credentials for github and dockerhub
   system:
@@ -46,31 +45,25 @@ credentials: #add credentials for github and dockerhub
               id: git-hub_key
               username: "jenkins"
               description: "git-hub_key"
-              password: "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"
+              password: "{{ jenkins_token }}"
           
           - usernamePassword:
               scope: GLOBAL
               id: Docker
               username: "eclipseq57"
               description: "Docker"
-              password: "g8lfC8UuV"
+              password: "{{ dockerhub_pass }}"
 
 jobs:
   - script: >
       multibranchPipelineJob('PetclinicQA') {
         branchSources {
           github {
-            // The id option in the Git and GitHub branch source contexts is now mandatory (JENKINS-43693).
-            id('qa') // IMPORTANT: use a constant and unique identifier
+            id('qa')
             scanCredentialsId('git-hub_key')
             repoOwner('electric12-dev')
             repository('spring-petclinic')
-            apiUri('https://github.com/api/v3') // Optional, needed for private github enterprise servers
-          }
-        }
-        orphanedItemStrategy {
-          discardOldItems {
-            numToKeep(1)
+            apiUri('https://github.com/api/v3')
           }
         }
         triggers {
