@@ -4,8 +4,8 @@
     remote_user: centos
     become_user: root
     vars_files:
-      - ../roles/jenkins/vars/pass.yml
-      - ../roles/jenkins/defaults/vars.yaml
+      - ./roles/jenkins/vars/pass.yml
+      - ./roles/jenkins/defaults/vars.yaml
     roles:
     - roles/jenkins
     
